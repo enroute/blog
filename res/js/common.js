@@ -16,7 +16,8 @@ function handler(){
     console.log('jquery added :)');
     $(function(){
         defaultFooterStyle = "margin-top:50px; text-align:center; color:#999; font-family:PingFangSC-Medium, Microsoft YaHei, sans-serif;font-size:14px;";
-        $("body").append('<div id="footer" style="' + defaultFooterStyle + '"><a href="http://www.miitbeian.gov.cn/">粤ICP备18025838</a><span class="hspace20">&nbsp;&nbsp;&nbsp;&nbsp;</span>Copyright © <a href="/">ZTFUN.COM</a> 2018</div>');
+        //$("body").append('<div id="footer" style="' + defaultFooterStyle + '"><a href="http://www.miitbeian.gov.cn/">粤ICP备18025838</a><span class="hspace20">&nbsp;&nbsp;&nbsp;&nbsp;</span>Copyright © <a href="/">ZTFUN.COM</a> 2018</div>');
+        $("body").append('<div id="footer" style="' + defaultFooterStyle + '">Copyright © <a href="/">ZTFUN.COM</a> 2018</div>');
 
         if($(document.body).height() < $(window).height()){
             $("#footer").attr("style", defaultFooterStyle + "position: fixed!important; bottom: 0px; left:50%; transform:translateX(-50%);");
