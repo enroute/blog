@@ -1,8 +1,9 @@
 # 卖米
-# 飞花 ()
+# 飞花 (原名：张培祥)
 
-[参考1](http://www.sohu.com/a/233330136_99992021)
-[参考2](https://baike.baidu.com/item/卖米)
+参考1:[搜狐](http://www.sohu.com/a/233330136_99992021)
+
+参考2:[百度百科](https://baike.baidu.com/item/卖米)
 
 ##1
 
