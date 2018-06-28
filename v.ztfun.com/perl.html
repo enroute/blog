@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>ZT粉 - Perl crawler for 链家</title>
+        <style type="text/css">
+         .footer {text-align:center; color:#999; font-family:PingFangSC-Medium, Microsoft YaHei, sans-serif;}
+         .hspace20 {min-width:20px; display:inline-block;}
+         a{color:inherit; text-decoration:none;}
+         a:hover{color:#C00;}
+         body{padding:20px;}
+         h1{text-align:center;}
+        </style>
+
+    <style type="text/css">
+    <!--
+      body {
+        color: #000000;
+        background-color: #e5e5e5;
+      }
+      .builtin {
+        /* font-lock-builtin-face */
+        color: #0000ee;
+        font-weight: bold;
+      }
+      .comment {
+        /* font-lock-comment-face */
+        color: #cd0000;
+      }
+      .comment-delimiter {
+        /* font-lock-comment-delimiter-face */
+        color: #cd0000;
+      }
+      .constant {
+        /* font-lock-constant-face */
+        color: #cd00cd;
+      }
+      .cperl-array {
+        /* cperl-array-face */
+        color: #0000ee;
+        background-color: #e5e5e5;
+        font-weight: bold;
+      }
+      .cperl-nonoverridable {
+        /* cperl-nonoverridable-face */
+        color: #00cd00;
+      }
+      .function-name {
+        /* font-lock-function-name-face */
+        color: #0000ee;
+        font-weight: bold;
+      }
+      .keyword {
+        /* font-lock-keyword-face */
+        color: #00cdcd;
+        font-weight: bold;
+      }
+      .string {
+        /* font-lock-string-face */
+        color: #00cd00;
+      }
+      .type {
+        /* font-lock-type-face */
+        color: #00cd00;
+      }
+      .variable-name {
+        /* font-lock-variable-name-face */
+        color: #cdcd00;
+      }
+
+      a {
+        color: inherit;
+        background-color: inherit;
+        font: inherit;
+        text-decoration: inherit;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    -->
+    </style>
+  </head>
+  <body>
+<h1>从链家爬数据</h1>
+    <pre>
+<span class="comment-delimiter">#</span><span class="comment">!/usr/bin/perl -w
+</span><span class="keyword">use</span> <span class="function-name">strict</span>;
+<span class="keyword">use</span> <span class="function-name">warnings</span>;
+<span class="keyword">use</span> <span class="function-name">LWP::UserAgent</span>;
+
+<span class="keyword">my</span> <span class="cperl-array">@detail_urls</span>;
+<span class="keyword">my</span> <span class="variable-name">$ua</span> = new LWP::UserAgent;
+$ua-&gt;timeout(120);
+
+<span class="keyword">my</span> <span class="variable-name">$host</span> = <span class="string">'https://sz.lianjia.com'</span>;
+<span class="keyword">my</span> <span class="variable-name">$baseurl</span> = <span class="string">"$host/ershoufang/pg1/"</span>;
+
+<span class="keyword">sub</span> <span class="function-name">get_page_url</span> {
+  <span class="keyword">my</span> (<span class="variable-name">$page</span>) = <span class="cperl-array">@_</span>;
+  $page //= 1;
+
+  <span class="keyword">return</span> <span class="string">"https://sz.lianjia.com/ershoufang/pg$page/"</span>;
+}
+
+<span class="keyword">sub</span> <span class="function-name">get_urls_in_page</span> {
+  <span class="keyword">my</span> (<span class="variable-name">$url</span>) = <span class="cperl-array">@_</span>;
+  $url || <span class="keyword">return</span>;
+
+  <span class="keyword">my</span> <span class="variable-name">$links</span> = <span class="string">`elinks -dump $url | grep '$host/ershoufang/[0-9]*.html' | awk '{print \$(NF)}' | sort | uniq`</span>;
+  <span class="keyword">my</span> <span class="cperl-array">@links</span> = <span class="cperl-nonoverridable">split</span><span class="constant">/</span><span class="function-name">[</span><span class="builtin">\</span><span class="type">r</span><span class="builtin">\</span><span class="type">n</span><span class="function-name">]</span><span class="builtin">+</span><span class="constant">/</span>, $links;
+
+  <span class="cperl-nonoverridable">push</span> <span class="cperl-array">@detail_urls</span>, <span class="cperl-array">@links</span>;
+
+  <span class="keyword">for</span>(<span class="cperl-array">@links</span>){
+    <span class="cperl-nonoverridable">print</span> <span class="string">"$_\n"</span>;
+  }
+}
+
+<span class="keyword">sub</span> <span class="function-name">handle_page</span> {
+  <span class="keyword">my</span> (<span class="variable-name">$ua</span>, <span class="variable-name">$url</span>) = <span class="cperl-array">@_</span>;
+  <span class="keyword">return</span> <span class="keyword">unless</span> $ua &amp;&amp; $url;
+
+  <span class="keyword">my</span> <span class="variable-name">$request</span> = new HTTP::Request(<span class="string">'GET'</span>, $url);
+  <span class="keyword">my</span> <span class="variable-name">$response</span> = $ua-&gt;request($request);
+  <span class="keyword">my</span> <span class="variable-name">$content</span> = $response-&gt;content();
+  <span class="cperl-nonoverridable">print</span> $content;
+}
+
+<span class="keyword">for</span>(1..100){
+  <span class="comment-delimiter">#</span><span class="comment">handle_page($ua, get_page_url(2));
+</span>  get_urls_in_page(get_page_url($_));
+  <span class="cperl-nonoverridable">print</span> STDERR <span class="string">"Handling page $_\n"</span>;
+}
+
+<span class="comment-delimiter"># </span><span class="comment">for(</span><span class="cperl-array">@detail_urls</span><span class="comment">){
+</span><span class="comment-delimiter">#   </span><span class="comment">print "$_\n";
+</span><span class="comment-delimiter"># </span><span class="comment">}</span></pre>
+
+        <div class="footer"><a href="http://www.miitbeian.gov.cn/">粤ICP备18025838</a><span class="hspace20"></span>Copyright © <a href="/">ZTFUN.COM</a> 2018</div>
+  </body>
+</html>

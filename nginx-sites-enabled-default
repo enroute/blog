@@ -22,8 +22,47 @@
 # redirect http to https
 server {
     listen 80;
-    server_name ztfun.com;
+    server_name ztfun.com 2ci.cc;
     rewrite ^(.*)$ https://$host$1 permanent;
+}
+
+server {
+    # SSL configuration
+    listen 443 ssl;
+    ssl on;
+    ssl_certificate cert/2ci.cc.pem;
+    ssl_certificate_key cert/2ci.cc.key;
+
+    root /usr/share/nginx/html/2ci.cc;
+
+    # Add index.php to the list if you are using PHP
+    index index.html index.htm index.nginx-debian.html;
+
+    server_name 2ci.cc;
+
+    location / {
+        # First attempt to serve request as file, then
+        # as directory, then fall back to displaying a 404.
+        #try_files $uri $uri/ =404;
+        try_files $uri $uri/ /index.php;
+
+        # Enable CORS
+        add_header Access-Control-Allow-Origin *;
+    }
+
+    # pass PHP scripts to FastCGI server
+    #
+    location ~ \.php$ {
+    #    include snippets/fastcgi-php.conf;
+    #
+    #   # With php-fpm (or other unix sockets):
+        fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+    #   # With php-cgi (or other tcp sockets):
+    #   fastcgi_pass 127.0.0.1:9000;
+
+        # Enable CORS
+        add_header Access-Control-Allow-Origin *;
+    }
 }
 
 server {
@@ -32,10 +71,10 @@ server {
 
     # SSL configuration
     #
-    listen 443 ssl default_server;
+    listen 443 ssl;
     ssl on;
-    ssl_certificate cert/214525441420980.pem;
-    ssl_certificate_key cert/214525441420980.key;
+    ssl_certificate cert/v.ztfun.com.pem;
+    ssl_certificate_key cert/v.ztfun.com.key;
 
     # listen [::]:443 ssl default_server;
     #
@@ -50,12 +89,12 @@ server {
     #
     # include snippets/snakeoil.conf;
 
-    root /var/www/html;
+    root /usr/share/nginx/html/v.ztfun.com;
 
     # Add index.php to the list if you are using PHP
     index index.html index.htm index.nginx-debian.html;
 
-    server_name ztfun.com;
+    server_name v.ztfun.com;
 
     location / {
         # First attempt to serve request as file, then
@@ -74,7 +113,7 @@ server {
     # pass PHP scripts to FastCGI server
     #
     location ~ \.php$ {
-        include snippets/fastcgi-php.conf;
+        include fastcgi.conf;
     #
     #   # With php-fpm (or other unix sockets):
         fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;

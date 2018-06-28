@@ -1,0 +1,184 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <meta name="viewport" content="width=640, initial-scale=1">
+
+    <!-- for UC compatibility -->
+    <meta name="wap-font-scale" content="no">
+
+    <title>Five in a row</title>
+
+    <link type="image/x-icon" href="favicon.png" rel="icon" />
+    <link type="image/x-icon" href="favicon.png" rel="shortcut icon" />
+
+    <script src="//code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script type="text/javascript" src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="/res/css/common.css">
+    <script type="text/javascript" src="/res/js/common.js"></script>
+
+    <style type="text/css">
+     .board {
+         margin-top:20px;
+     }
+     .board img {
+         width:100%;
+         height:auto;
+         position:absolute;
+     }
+     #indicator {
+         position:absolute;
+     }
+     .chess {
+         width:1.7rem;
+         height:1.7rem;
+         border-radius:1.7rem;
+         background:white;
+         position:absolute;
+     }
+     .black {
+         background:black;
+         color:white;
+     }
+     .active {
+         border:1px red;
+     }
+    </style>
+</head>
+
+<body>
+    <div class="board">
+        <img src="res/board.jpg" />
+        <div id="indicator"></div>
+    </div>
+    <div id="info"></div>
+    <div id="regret">Regret</div>
+</body>
+
+<script type="text/javascript">
+ lock = false;
+ started = false;
+
+ function interval(x, array){
+     if (x <= array[0]) return [array[0], array[0]];
+     if (x >= array[array.length - 1]) return [array[array.length - 1], array[array.length - 1]];
+
+     for(i = 1; i < array.length; i++){
+         if (x < array[i]){
+             return [array[i -1], array[i]];
+         }
+     }
+
+     //Error if goes here!
+ }
+
+ function distance2(x1, y1, x2, y2){
+     var dx = x2 - x1;
+     var dy = y2 - y1;
+     return dx * dx + dy * dy;
+ }
+
+ function nearestPoint(x, y, x1, y1, x2, y2){
+     var xmid = (x1 + x2) / 2;
+     var ymid = (y1 + y2) / 2;
+     var xx = x1;
+     var yy = y1;
+     if (x > xmid){
+         xx = x2;
+     }
+     if (y > ymid){
+         yy= y2;
+     }
+     return [xx, yy];
+ }
+
+ var boardWidth  = 535;
+ var boardHeight = 535;
+ var coords = [22, 57, 92 , 127, 162, 197, 232, 267, 302, 337, 372, 407, 442, 477, 512];
+ var chess = new Array();
+ function narrowPQ(x, array, p, q){
+     var m = Math.round((p + q) / 2);
+     if (x < array[m]) return [p, m];
+     else              return [m, q];
+ }
+ function nearestIndex(x, array){
+     var p = 0;
+     var q = array.length - 1;
+     while (p + 1 < q){
+         [p, q] = narrowPQ(x, array, p, q);
+     }
+     var mid = (array[p] + array[q]) / 2;
+     if (x < mid) return p;
+     else         return q;
+ }
+ 
+ function offsetToRowCol(offsetX, offsetY){
+     var boardWidthPx = $(".board img").width();
+     var boardHeightPx = $(".board img").height();
+     var x = offsetX * boardWidth / boardWidthPx;
+     var y = offsetY * boardHeight / boardHeightPx;
+
+     /* [x1, x2] = interval(x, coords);
+      * [y1, y2] = interval(y, coords);
+      * [xx, yy] = nearestPoint(x, y, x1, y1, x2, y2);*/
+     xx = nearestIndex(x, coords);
+     yy = nearestIndex(y, coords);
+
+     x = coords[xx] * boardWidthPx / boardWidth;
+     y = coords[yy] * boardHeightPx / boardHeight;
+
+     return [x, y, xx, yy, boardWidthPx, boardHeightPx];
+ }
+
+ function setInfo(text){
+     $("#info").html(text);
+ }
+
+ $(".board img").on("click", function(e){
+     if (lock || started) return;
+
+     [x, y, xx, yy, w, h] = offsetToRowCol(e.offsetX, e.offsetY);
+     setInfo("xx:" + xx + ", yy:" + yy + ", x:" + x + ", y:" + y);
+
+     chess.push([x, y]);
+     draw(x, y);
+ });
+
+ function draw(x, y){
+     console.log(chess);
+     var html = "";
+     for(i = 0; i < chess.length; i++){
+         html += '<div class="chess" id="chess' + i + '"></div>';
+     }
+     $("#indicator").html(html);
+     console.log(html);
+     for(i = 0; i < chess.length; i++){
+         [l, t] = chess[i];
+         $("#chess" + i)
+             .css("left", l)
+             .css("top", t)
+             .css("transform", "translateX(-50%) translateY(-50%)");
+         if (i % 2){
+             $("#chess" + i).addClass("black");
+         }
+     }
+     //$("#chess" + (chess.length - 1)).addClass("active");
+ }
+
+ function regret(){
+     chess.slice(-1, 1);
+     draw();
+ }
+
+ $(function(){
+     $("#regret")
+         //.css("top", $(".board img").height() + 20)
+         .on("click", function(e){
+             regret();
+         });
+ });
+</script>
+</html>
