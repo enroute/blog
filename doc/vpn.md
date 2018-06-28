@@ -52,3 +52,9 @@ Then connect. It should be OK now if everything works fine.
 sudo apt-get install openvpn
 ```
 
+## Missing the install Shadowsocks button on KiwiVM control panel?
+1. Login KiwiVM
+2. For Shadowsocks, click [here](https://kiwivm.64clouds.com/main-exec.php?mode=extras_shadowsocks)
+3. For ShadowsocksR, click [here](https://kiwivm.64clouds.com/main-exec.php?mode=extras_shadowsocksr)
+
+
