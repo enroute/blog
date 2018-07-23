@@ -58,3 +58,10 @@ sudo apt-get install openvpn
 3. For ShadowsocksR, click [here](https://kiwivm.64clouds.com/main-exec.php?mode=extras_shadowsocksr)
 
 
+## Test IP on BWH is in blacklist or not
+### Option 1
+1. Login KiwiVM
+2. Go to URL [https://kiwivm.64clouds.com/main-exec.php?mode=blacklistcheck](https://kiwivm.64clouds.com/main-exec.php?mode=blacklistcheck)
+
+### Option 2
+Use [ping.pe](http://ping.pe) or [chinaz](http://ping.chinaz.com)
