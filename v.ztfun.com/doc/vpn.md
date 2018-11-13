@@ -57,6 +57,62 @@ sudo apt-get install openvpn
 2. For Shadowsocks, click [here](https://kiwivm.64clouds.com/main-exec.php?mode=extras_shadowsocks)
 3. For ShadowsocksR, click [here](https://kiwivm.64clouds.com/main-exec.php?mode=extras_shadowsocksr)
 
+## Connection refused after installing shadowsocks?
+To install shadowsocks server on Ubuntu:
+```
+sudo apt-get update
+sudo apt-get install python-pip
+sudo pip install shadowsocks
+```
+
+Create the configuration file, e.g., one may put it in /etc/shadowsocks.json, the content of which should be like:
+```
+{
+    "server":"::",
+    "server_port":9988,
+    "local_address":"127.0.0.1",
+    "local_port":1080,
+    "password":"mypassword",
+    "timeout":300,
+    "method":"aes-256-cfb"
+}
+```
+
+Note that the server is "::", otherwise, if one use "your.domain.com" as the "server" field, one may get the following output after SS daemon started:
+```
+$ netstat -ntlp
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp        0      0 127.0.1.1:9988          0.0.0.0:*               LISTEN      24472/python
+```
+where the "127.0.1.1:9988" may refuse the client connection from outside the server. But with "::" as server, the output should look like:
+```
+$ netstat -ntlp
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp6       0      0 ::::9988                0.0.0.0:*               LISTEN      24472/python
+```
+which accepts connection from outside.
+
+One may test the connection with wget:
+```
+wget your.host.com:9988
+```
+
+If one gets error when starting the SS server with
+```
+ssserver -c /etc/shadowsocks.json -d start
+```
+then try update with the newest version with:
+```
+sudo pip install -U git+https://github.com/shadowsocks/shadowsocks.git@master
+```
+
+Make it auto start after system boot, add the following line to the end of /etc/rc.local:
+```
+/usr/local/bin/sserver -c /etc/shadowsocks..json -d start
+```
+
 
 ## Test IP on BWH is in blacklist or not
 ### Option 1
